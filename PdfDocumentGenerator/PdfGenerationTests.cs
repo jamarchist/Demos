@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
@@ -45,7 +46,28 @@ namespace PdfDocumentGenerator
 
             var doc = new Document();
             var section = doc.AddSection();
+
+            var title = section.AddParagraph("Standings");
+            title.Format.Font.Size = Unit.FromPoint(16);
+            title.Format.Font.Underline = Underline.Single;
+            title.Format.Alignment = ParagraphAlignment.Center;
+            title.Format.SpaceAfter = Unit.FromPoint(12);
+
+            var atlanticHeading = section.AddParagraph("Atlantic Division");
+            atlanticHeading.Format.Font.Bold = true;
+            atlanticHeading.Format.Borders.Bottom.Color = Colors.Black;
+            atlanticHeading.Format.Borders.Bottom.Width = Unit.FromPoint(1);
+            section.AddParagraph();
+            
             var atlanticTable = AddDivisionTableTo(section, "Atlantic");
+            section.AddParagraph();
+            
+            var centralHeading = section.AddParagraph("Cental Division");
+            centralHeading.Format.Font.Bold = true;
+            centralHeading.Format.Borders.Bottom.Color = Colors.Black;
+            centralHeading.Format.Borders.Bottom.Width = Unit.FromPoint(1);
+            section.AddParagraph();
+
             var centralTable = AddDivisionTableTo(section, "Central");
             
             PopulateDivisionTable(atlanticTable, atlanticData);
@@ -77,6 +99,8 @@ namespace PdfDocumentGenerator
             headerRow.Cells[2].AddParagraph("Nickname");
             headerRow.Cells[3].AddParagraph("Wins");
 
+            headerRow.Borders.Width = Unit.FromPoint(1);
+
             return divisionTable;
         }
 
@@ -85,6 +109,12 @@ namespace PdfDocumentGenerator
             foreach (var row in source)
             {
                 var pdfRow = table.AddRow();
+                pdfRow.Borders.Width = Unit.FromPoint(1);
+                pdfRow.Borders.Bottom.Color = Colors.LightGray;
+                pdfRow.Borders.Right.Color = Colors.LightGray;
+                pdfRow.Borders.Left.Color = Colors.LightGray;
+
+                pdfRow.Borders.Top.Color = Array.IndexOf(source, row) == 0 ? Colors.Black : Colors.LightGray;
 
                 pdfRow.Cells[0].AddParagraph(row["Id"].ToString());
                 pdfRow.Cells[1].AddParagraph(row["Name"].ToString());
